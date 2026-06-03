@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur Assurance - Holland Bikes</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #f0f2f5; 
+            color: #333; 
+            padding: 20px; 
+            display: flex;
+            justify-content: center;
+        }
+        .container { 
+            width: 100%;
+            max-width: 850px; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+        }
+        .header-logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header-logo img {
+            width: 180px;
+            height: auto;
+        }
+        h1 { color: #E84E1B; text-align: center; margin-bottom: 30px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-top: 0; }
+        
+        .input-group { display: flex; gap: 20px; margin-bottom: 20px; }
+        .input-wrapper { flex: 1; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9em; color: #555; }
+        input[type="number"], input[type="date"] { 
+            width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; 
+            font-size: 16px; box-sizing: border-box; transition: border-color 0.2s;
+        }
+        input[type="number"]:focus, input[type="date"]:focus { border-color: #E84E1B; outline: none; }
+
+        /* Checkbox styling */
+        .checkbox-group {
+            margin-bottom: 30px;
+        }
+        .checkbox-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            color: #555;
+            user-select: none;
+            padding: 12px 16px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            transition: border-color 0.2s, background-color 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .checkbox-label:hover {
+            border-color: #E84E1B;
+            background-color: #fff8f6;
+        }
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #E84E1B;
+            flex-shrink: 0;
+        }
+        .checkbox-label.checked {
+            border-color: #E84E1B;
+            background-color: #fdf3f0;
+            color: #E84E1B;
+        }
+
+        .results { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; opacity: 0.2; transition: opacity 0.3s; pointer-events: none; }
+        .results.active { opacity: 1; pointer-events: auto; }
+
+        .card { 
+            background: #fff; border: 1px solid #e1e1e1; border-radius: 10px; 
+            padding: 20px; position: relative; display: flex; flex-direction: column;
+        }
+        .card.highlight { border: 2px solid #E84E1B; background-color: #fffefc; }
+        
+        .card-header { font-size: 1em; font-weight: bold; margin-bottom: 10px; color: #555; text-transform: uppercase; }
+        .price-main { font-size: 2.2em; font-weight: 800; color: #E84E1B; margin-bottom: 5px; }
+        .price-label { font-size: 0.85em; color: #666; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
+        
+        .comparison-box { background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #eee; }
+        .comp-line { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9em; }
+        .comp-line.total { border-top: 1px solid #ddd; margin-top: 8px; padding-top: 8px; font-weight: bold; color: #000; }
+        .comp-val { font-weight: bold; color: #E84E1B; }
+
+        .code-block { 
+            background: #fff; border: 1px dashed #ccc; padding: 10px; 
+            border-radius: 6px; font-family: monospace; font-size: 0.8em; margin-bottom: 20px;
+        }
+
+        .copy-section { margin-top: auto; border-top: 1px solid #eee; padding-top: 15px; }
+        .copy-text { 
+            font-size: 0.8em; color: #444; line-height: 1.5; white-space: pre-line; 
+            margin-bottom: 12px; font-family: 'Courier New', Courier, monospace;
+            background: #fdfdfd; border: 1px solid #eee; padding: 10px; border-radius: 4px;
+        }
+        .btn-copy {
+            background-color: #333; color: white; border: none; padding: 10px 16px;
+            border-radius: 6px; cursor: pointer; font-size: 0.9em; width: 100%;
+            transition: all 0.2s; font-weight: bold;
+        }
+        .btn-copy:hover { background-color: #E84E1B; }
+
+        .doc-section { margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; text-align: center; }
+        .btn-download {
+            display: inline-flex; align-items: center; background-color: #555; color: white;
+            padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.85em;
+        }
+
+        .alert { background-color: #fdf3f0; border-left: 5px solid #E84E1B; padding: 20px; margin-top: 20px; border-radius: 4px; }
+        .alert h4 { margin: 0 0 5px 0; color: #E84E1B; }
+        .alert ul { margin: 0; padding-left: 20px; color: #555; font-size: 0.85em; }
+
+        @media (max-width: 750px) { .results { grid-template-columns: 1fr; } .input-group { flex-direction: column; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-logo">
+        <img src="Logo_HB_v1_Bleu-250.webp" alt="Logo Holland Bikes">
+    </div>
+    <h1>Assurance Holland Bikes</h1>
+
+    <div class="input-group">
+        <div class="input-wrapper">
+            <label for="bikePrice">Prix du Vélo (TTC)</label>
+            <input type="number" id="bikePrice" placeholder="Ex: 2499" oninput="calculate()">
+        </div>
+        <div class="input-wrapper">
+            <label for="purchaseDate">Date d'achat</label>
+            <input type="date" id="purchaseDate" onchange="calculate()">
+        </div>
+    </div>
+
+    <div class="checkbox-group">
+        <label class="checkbox-label" id="checkboxLabel">
+            <input type="checkbox" id="standaloneInsurance" onchange="toggleStandalone(this)">
+            Assurance vendue seule, sans vélo
+        </label>
+    </div>
+
+    <div class="results" id="resultsArea">
+        <div class="card">
+            <div class="card-header">Extension assurance 1 an</div>
+            <div class="price-main" id="price1Year">0,00 €</div>
+            <div class="price-label">Montant de l'assurance</div>
+            
+            <div class="comparison-box">
+                <div class="comp-line"><span>Prix / mois :</span> <span class="comp-val" id="month1">0,00 €</span></div>
+                <div class="comp-line"><span>Prix / an :</span> <span class="comp-val" id="year1">0,00 €</span></div>
+                <div class="comp-line total"><span id="totalLabel1">TOTAL (Vélo + Assur.) :</span> <span id="total1">0,00 €</span></div>
+            </div>
+
+            <div class="code-block">
+                <strong>Code CycleSoftware :</strong><br>2181007168585
+            </div>
+            
+            <div class="copy-section">
+                <div class="copy-text" id="note1Year">...</div>
+                <button class="btn-copy" onclick="copyToClipboard('note1Year', this)">Copier la remarque</button>
+            </div>
+        </div>
+
+        <div class="card highlight">
+            <div class="card-header" style="color:#E84E1B;">Extension assurance 2 ans</div>
+            <div class="price-main" id="price2Years">0,00 €</div>
+            <div class="price-label">Montant de l'assurance</div>
+
+            <div class="comparison-box">
+                <div class="comp-line"><span>Prix / mois :</span> <span class="comp-val" id="month2">0,00 €</span></div>
+                <div class="comp-line"><span>Prix / an :</span> <span class="comp-val" id="year2">0,00 €</span></div>
+                <div class="comp-line total"><span id="totalLabel2">TOTAL (Vélo + Assur.) :</span> <span id="total2">0,00 €</span></div>
+            </div>
+            
+            <div class="code-block" style="border-color:#E84E1B;">
+                <strong>Code CycleSoftware :</strong><br>2181007168622
+            </div>
+            
+            <div class="copy-section">
+                <div class="copy-text" id="note2Years">...</div>
+                <button class="btn-copy" onclick="copyToClipboard('note2Years', this)">Copier la remarque</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="doc-section">
+        <a href="Notice_Assurance_Vol_Casse.pdf" target="_blank" class="btn-download">
+            Consulter la Notice d'Assurance
+        </a>
+    </div>
+
+    <div class="alert">
+        <h4>⚠️ Procédure CycleSoftware</h4>
+        <ul>
+            <li>Ajouter l'article via son code sur la facture.</li>
+            <li><strong>Ne pas cocher</strong> la case "assurance" dans le logiciel.</li>
+            <li>L'assurance s'active automatiquement (4 mois offerts inclus).</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    document.getElementById('purchaseDate').valueAsDate = new Date();
+    calculate();
+
+    function formatC(val) {
+        return val.toLocaleString('fr-FR', {style:'currency', currency: 'EUR'});
+    }
+
+    function toggleStandalone(checkbox) {
+        const label = document.getElementById('checkboxLabel');
+        if (checkbox.checked) {
+            label.classList.add('checked');
+        } else {
+            label.classList.remove('checked');
+        }
+        calculate();
+    }
+
+    function calculate() {
+        const priceInput = document.getElementById('bikePrice').value;
+        const dateInput = document.getElementById('purchaseDate').value;
+        const standalone = document.getElementById('standaloneInsurance').checked;
+        const resultsArea = document.getElementById('resultsArea');
+
+        if (priceInput && priceInput > 0) {
+            resultsArea.classList.add('active');
+            const vPrice = parseFloat(priceInput);
+            const purchaseDate = new Date(dateInput);
+
+            const a1an = vPrice * 0.075;
+            const a2ans = vPrice * 0.075 * 2 * 0.8;
+
+            document.getElementById('price1Year').innerText = formatC(a1an);
+            document.getElementById('price2Years').innerText = formatC(a2ans);
+
+            document.getElementById('month1').innerText = formatC(a1an / 16);
+            document.getElementById('year1').innerText = formatC(a1an);
+
+            document.getElementById('month2').innerText = formatC(a2ans / 28);
+            document.getElementById('year2').innerText = formatC(a2ans / 2);
+
+            if (standalone) {
+                document.getElementById('totalLabel1').innerText = 'TOTAL Assurance :';
+                document.getElementById('total1').innerText = formatC(a1an);
+                document.getElementById('totalLabel2').innerText = 'TOTAL Assurance :';
+                document.getElementById('total2').innerText = formatC(a2ans);
+            } else {
+                document.getElementById('totalLabel1').innerText = 'TOTAL (Vélo + Assur.) :';
+                document.getElementById('total1').innerText = formatC(vPrice + a1an);
+                document.getElementById('totalLabel2').innerText = 'TOTAL (Vélo + Assur.) :';
+                document.getElementById('total2').innerText = formatC(vPrice + a2ans);
+            }
+
+            if (standalone) {
+                // Standalone mode: insurance starts directly on purchase date
+                const d1yFin = new Date(purchaseDate);
+                d1yFin.setFullYear(d1yFin.getFullYear() + 1);
+
+                const d2yFin = new Date(purchaseDate);
+                d2yFin.setFullYear(d2yFin.getFullYear() + 2);
+
+                document.getElementById('note1Year').innerText =
+                    `Assurance 1 an : du ${purchaseDate.toLocaleDateString('fr-FR')} au ${d1yFin.toLocaleDateString('fr-FR')}.`;
+
+                document.getElementById('note2Years').innerText =
+                    `Assurance 2 ans : du ${purchaseDate.toLocaleDateString('fr-FR')} au ${d2yFin.toLocaleDateString('fr-FR')}.`;
+            } else {
+                // Standard mode: 4 months offered, then extension starts
+                const d4mFin = new Date(purchaseDate);
+                d4mFin.setMonth(d4mFin.getMonth() + 4);
+
+                const dExtDebut = new Date(d4mFin);
+                dExtDebut.setDate(dExtDebut.getDate() + 1);
+
+                const d1yFin = new Date(dExtDebut);
+                d1yFin.setFullYear(d1yFin.getFullYear() + 1);
+
+                const d2yFin = new Date(dExtDebut);
+                d2yFin.setFullYear(d2yFin.getFullYear() + 2);
+
+                const t4m = `4 mois offerts : du ${purchaseDate.toLocaleDateString('fr-FR')} au ${d4mFin.toLocaleDateString('fr-FR')}.`;
+
+                document.getElementById('note1Year').innerText =
+                    `${t4m}\nExtension 1 an : du ${dExtDebut.toLocaleDateString('fr-FR')} au ${d1yFin.toLocaleDateString('fr-FR')}.`;
+
+                document.getElementById('note2Years').innerText =
+                    `${t4m}\nExtension 2 ans : du ${dExtDebut.toLocaleDateString('fr-FR')} au ${d2yFin.toLocaleDateString('fr-FR')}.`;
+            }
+        } else {
+            resultsArea.classList.remove('active');
+        }
+    }
+
+    function copyToClipboard(elementId, btnElement) {
+        const text = document.getElementById(elementId).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const old = btnElement.innerText;
+            btnElement.innerText = "Copié ! ✅";
+            setTimeout(() => { btnElement.innerText = old; }, 1500);
+        });
+    }
+</script>
+
+</body>
+</html>
